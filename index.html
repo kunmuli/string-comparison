@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <title>Demo of comparing strings</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script src="./js/diff_match_patch.js"></script>
+  </head>
+  <body style="background-color: #ccc">
+    <h2>Demo of comparing strings</h2>
+    <p>
+      Diff takes two texts and finds the differences. This implementation works
+      on a character by character basis. The result of any diff may contain
+      'chaff', irrelevant small commonalities which complicate the output. A
+      post-diff cleanup algorithm factors out these trivial commonalities.
+    </p>
+
+    <table width="100%">
+      <tr>
+        <td width="50%">
+          <h3>Text Version 1:</h3>
+          <textarea id="text1" style="width: 100%" rows="8"></textarea>
+        </td>
+        <td width="50%">
+          <h3>Text Version 2:</h3>
+          <textarea id="text2" style="width: 100%" rows="8"></textarea>
+        </td>
+      </tr>
+    </table>
+
+    <!-- <h4>Diff timeout:</h3>
+    <p>
+      <input type="text" size="3" maxlength="5" value="1" id="timeout" />
+      seconds<br />
+      If the mapping phase of the diff computation takes longer than this, then
+      the computation is truncated and the best solution to date is returned.
+      While guaranteed to be correct, it may not be optimal. A timeout of '0'
+      allows for unlimited computation.
+    </p>
+    -->
+    <h3>Post-diff cleanup:</h3>
+    <dl>
+      <dt>
+        <input type="radio" name="cleanup" id="semantic" checked />
+        <label for="semantic">Semantic Cleanup</label>
+      </dt>
+      <dd>
+        Increase human readability by factoring out commonalities which are
+        likely to be coincidental.
+      </dd>
+      <dt>
+        <input type="radio" name="cleanup" id="efficiency" />
+        <label for="efficiency">Efficiency Cleanup</label>, edit cost:
+        <input type="text" size="3" maxlength="5" value="4" id="editcost" />
+      </dt>
+
+      <dd>
+        Increase computational efficiency by factoring out short commonalities
+        which are not worth the overhead. The larger the edit cost, the more
+        aggressive the cleanup.
+      </dd>
+      <dt>
+        <input type="radio" name="cleanup" id="raw" />
+        <label for="raw">No Cleanup</label>
+      </dt>
+      <dd>Raw output.</dd>
+    </dl>
+
+    <p><input type="button" onClick="launch()" value="Compute Diff" /></p>
+
+    <div
+      id="outputdiv"
+      style="margin-bottom: 20px; border: 1px solid; background-color: #fff"
+    ></div>
+    <script>
+      var dmp = new diff_match_patch();
+
+      function launch() {
+        var text1 = document.getElementById("text1").value;
+        var text2 = document.getElementById("text2").value;
+        // dmp.Diff_Timeout = parseFloat(document.getElementById("timeout").value);
+        dmp.Diff_Timeout = parseFloat(1);
+        dmp.Diff_EditCost = parseFloat(
+          document.getElementById("editcost").value
+        );
+
+        var ms_start = new Date().getTime();
+        var d = dmp.diff_main(text1, text2);
+        var ms_end = new Date().getTime();
+
+        if (document.getElementById("semantic").checked) {
+          dmp.diff_cleanupSemantic(d);
+        }
+        if (document.getElementById("efficiency").checked) {
+          dmp.diff_cleanupEfficiency(d);
+        }
+        var ds = dmp.diff_prettyHtml(d);
+        console.log(ds);
+        document.getElementById("outputdiv").innerHTML =
+          ds + "<BR>Time: " + (ms_end - ms_start) / 1000 + "s";
+      }
+    </script>
+  </body>
+</html>
