@@ -1,21 +1,20 @@
 <html>
   <head>
-    <title>Demo of comparing strings</title>
+    <title>Text Comparison</title>
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
-    <script src="./js/diff_match_patch.js"></script>
+    <script src="./js/diff_match_patch_uncompressed.js"></script>
   </head>
-  <body style="background-color: #ccc">
-    <h2>Demo of comparing strings</h2>
+  <body style="background-color: #eee">
+  <div class="container-fluid">
+    <h2>Text Comparison</h2>
     <p>
-      Diff takes two texts and finds the differences. This implementation works
-      on a character by character basis. The result of any diff may contain
-      'chaff', irrelevant small commonalities which complicate the output. A
-      post-diff cleanup algorithm factors out these trivial commonalities.
+      The site takes two texts and finds the differences. This implementation
+      works on a character by character basis.
     </p>
 
     <table width="100%">
@@ -40,7 +39,7 @@
       While guaranteed to be correct, it may not be optimal. A timeout of '0'
       allows for unlimited computation.
     </p>
-    -->
+    
     <h3>Post-diff cleanup:</h3>
     <dl>
       <dt>
@@ -68,13 +67,26 @@
       </dt>
       <dd>Raw output.</dd>
     </dl>
-
-    <p><input type="button" onClick="launch()" value="Compute Diff" /></p>
-
+    -->
+    <p class="mt-3 text-center">
+      <button type="button" class="btn btn-success" onClick="launch()">
+        Compute Diff
+      </button>
+      <button type="button" class="btn btn-primary" onClick="textAreaClear()">
+        Reset
+      </button>
+    </p>
     <div
       id="outputdiv"
       style="margin-bottom: 20px; border: 1px solid; background-color: #fff"
     ></div>
+    <hr />
+    <div>
+    <footer class="container-fluid text-center">
+      <p>
+        © 2021 <a href="http://ernestmuli.me/">kunmuli</a>.
+      </p>
+    </footer>
     <script>
       var dmp = new diff_match_patch();
 
@@ -83,24 +95,33 @@
         var text2 = document.getElementById("text2").value;
         // dmp.Diff_Timeout = parseFloat(document.getElementById("timeout").value);
         dmp.Diff_Timeout = parseFloat(1);
-        dmp.Diff_EditCost = parseFloat(
+        /* dmp.Diff_EditCost = parseFloat(
           document.getElementById("editcost").value
-        );
+        ); */
+        dmp.Diff_EditCost = parseFloat(4);
 
         var ms_start = new Date().getTime();
         var d = dmp.diff_main(text1, text2);
         var ms_end = new Date().getTime();
-
+        /*
         if (document.getElementById("semantic").checked) {
           dmp.diff_cleanupSemantic(d);
         }
         if (document.getElementById("efficiency").checked) {
           dmp.diff_cleanupEfficiency(d);
-        }
+        }*/
+        dmp.diff_cleanupSemantic(d);
         var ds = dmp.diff_prettyHtml(d);
-        console.log(ds);
+        /*
         document.getElementById("outputdiv").innerHTML =
           ds + "<BR>Time: " + (ms_end - ms_start) / 1000 + "s";
+        */
+        document.getElementById("outputdiv").innerHTML = ds;
+      }
+      function textAreaClear() {
+        document.getElementById("text1").value = "";
+        document.getElementById("text2").value = "";
+        document.getElementById("outputdiv").innerHTML = "";
       }
     </script>
   </body>
